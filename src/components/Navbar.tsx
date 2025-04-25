@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -61,8 +60,12 @@ const Navbar = () => {
             <Button variant="ghost" onClick={toggleSearch}>
               <Search className="h-5 w-5" />
             </Button>
-            <Button variant="outline">Sign In</Button>
-            <Button>Join Now</Button>
+            <Link to="/signin">
+              <Button variant="outline">Sign In</Button>
+            </Link>
+            <Link to="/signup">
+              <Button>Join Now</Button>
+            </Link>
             <Avatar>
               <AvatarImage src="" />
               <AvatarFallback>GU</AvatarFallback>
@@ -131,8 +134,12 @@ const Navbar = () => {
               </div>
             </div>
             <div className="mt-3 px-2 space-y-1">
-              <Button variant="outline" className="w-full justify-center">Sign In</Button>
-              <Button className="w-full justify-center">Join Now</Button>
+              <Link to="/signin">
+                <Button variant="outline" className="w-full justify-center">Sign In</Button>
+              </Link>
+              <Link to="/signup">
+                <Button className="w-full justify-center">Join Now</Button>
+              </Link>
             </div>
           </div>
         </div>
