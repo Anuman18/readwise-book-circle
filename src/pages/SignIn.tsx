@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Mail, Lock, Google } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const SignIn = () => {
@@ -100,7 +100,7 @@ const SignIn = () => {
               className="w-full"
               onClick={() => console.log("Google sign-in")}
             >
-              <Google className="mr-2 h-4 w-4" />
+              <Globe className="mr-2 h-4 w-4" />
               Sign in with Google
             </Button>
           </div>
