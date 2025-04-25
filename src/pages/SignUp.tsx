@@ -1,23 +1,61 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Mail, Lock, User, Globe } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
+import { toast } from "@/components/ui/sonner";
 
 const SignUp = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Ready for backend integration
-    console.log("Sign up attempt:", formData);
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.name,
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      toast.success("Check your email to confirm your account!");
+      navigate("/signin");
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignUp = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (error: any) {
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -96,8 +134,8 @@ const SignUp = () => {
           </div>
 
           <div className="space-y-4">
-            <Button type="submit" className="w-full">
-              Create account
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Creating account..." : "Create account"}
             </Button>
 
             <div className="relative">
@@ -115,7 +153,8 @@ const SignUp = () => {
               type="button"
               variant="outline"
               className="w-full"
-              onClick={() => console.log("Google sign-up")}
+              onClick={handleGoogleSignUp}
+              disabled={isLoading}
             >
               <Globe className="mr-2 h-4 w-4" />
               Sign up with Google
