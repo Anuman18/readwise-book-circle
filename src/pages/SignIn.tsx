@@ -1,8 +1,9 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Mail, Lock, Globe } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, Globe, AlertTriangle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { toast } from "@/components/ui/sonner";
@@ -11,13 +12,27 @@ const SignIn = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMissingCredentials, setIsMissingCredentials] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
+  useEffect(() => {
+    // Check if Supabase credentials are configured
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    setIsMissingCredentials(!supabaseUrl || !supabaseAnonKey);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (isMissingCredentials) {
+      toast.error("Supabase credentials not configured. Authentication is disabled.");
+      return;
+    }
+    
     setIsLoading(true);
 
     try {
@@ -38,6 +53,11 @@ const SignIn = () => {
   };
 
   const handleGoogleSignIn = async () => {
+    if (isMissingCredentials) {
+      toast.error("Supabase credentials not configured. Authentication is disabled.");
+      return;
+    }
+
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -64,6 +84,15 @@ const SignIn = () => {
             </Link>
           </p>
         </div>
+
+        {isMissingCredentials && (
+          <div className="p-4 border border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 rounded-md flex items-center gap-3">
+            <AlertTriangle className="h-5 w-5 text-yellow-500" />
+            <div className="text-sm text-yellow-700 dark:text-yellow-400">
+              Supabase credentials are not configured. Authentication features are disabled.
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
@@ -145,3 +174,4 @@ const SignIn = () => {
 };
 
 export default SignIn;
+
